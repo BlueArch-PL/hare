@@ -1,0 +1,30 @@
+// Program
+program = _{ SOI ~ ("{"? ~ statement ~ "}"?)* ~ EOI }
+
+// Statements
+statement = { expr ~ ";" }
+// assignment = { ident ~ "=" ~ expr }
+
+// Expressions
+expr = { term ~ (bin_op ~ term)* }
+term = _{ constant | ident }
+bin_op = _{ add | subtract | multiply | divide | modulo | equals }
+        add = @{ "+" }
+        subtract = @{ "-" }
+        multiply = @{ "*" }
+        divide = @{ "/" }
+        modulo = @{ "%" }
+        equals = @{ "==" }
+
+// Identifiers
+ident = @{ (LETTER | "_" | NUMBER)+}
+
+// Constants
+constant = { int | float | string | boolean }
+int = @{NUMBER+}
+float = @{"0." | (NUMBER)+ ~ "." ~ (NUMBER)+}
+string = @{"\"" ~ LETTER* ~ "\""}
+boolean = @{"true" | "false"}
+
+WHITESPACE = _{ " " }
+COMMENT = _{ "#" ~ (!"\n" ~ ANY)* }
