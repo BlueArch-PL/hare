@@ -10,7 +10,7 @@ use utils::*;
 pub use ast::*;
 pub use grammar::{BlueArchParser, Rule};
 
-pub fn parse_pairs(pairs: Pairs<Rule>, level: Option<u8>) -> Result<Vec<AstNode>, String> {
+pub fn parse_pairs(pairs: Pairs<Rule>, level: Option<u8>) -> Result<Vec<AstNode>, pest::error::Error<Rule>> {
     let mut ast_nodes: Vec<AstNode> = vec![];
     for pair in pairs {
         print_pair(&pair, level);
@@ -80,7 +80,7 @@ pub fn parse_pairs(pairs: Pairs<Rule>, level: Option<u8>) -> Result<Vec<AstNode>
     Ok(ast_nodes)
 }
 
-pub fn parse(input: &str) -> Result<Vec<AstNode>, String> {
-    let pairs = BlueArchParser::parse(Rule::program, input);
-    parse_pairs(pairs.unwrap(), Some(0))
+pub fn parse(input: &str) -> Result<Vec<AstNode>, pest::error::Error<Rule>> {
+    let pairs = BlueArchParser::parse(Rule::program, input)?;
+    parse_pairs(pairs, Some(0))
 }
