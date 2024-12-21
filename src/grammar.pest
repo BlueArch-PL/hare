@@ -8,13 +8,31 @@ statement = { expr ~ ";" }
 // Expressions
 expr = { term ~ (bin_op ~ term)* }
 term = _{ constant | ident }
-bin_op = _{ add | subtract | multiply | divide | modulo | equals }
-        add = @{ "+" }
-        subtract = @{ "-" }
-        multiply = @{ "*" }
-        divide = @{ "/" }
-        modulo = @{ "%" }
-        equals = @{ "==" }
+bin_op = _{ 
+    add
+    | subtract
+    | multiply
+    | divide
+    | modulo 
+    | equals 
+    | not_equals
+    | greater_than_or_equal_to 
+    | less_than_or_equal_to  
+    | greater_than 
+    | less_than 
+}
+
+add = @{ "+" }
+subtract = @{ "-" }
+multiply = @{ "*" }
+divide = @{ "/" }
+modulo = @{ "%" }
+equals = @{ "==" }
+not_equals = @{ "!=" }
+greater_than = @{ ">" }
+less_than = @{ "<" }
+greater_than_or_equal_to = @{ ">=" }
+less_than_or_equal_to = @{ "<=" }
 
 // Identifiers
 ident = @{ (LETTER | "_" | NUMBER)+}

@@ -10,7 +10,10 @@ use utils::*;
 pub use ast::*;
 pub use grammar::{BlueArchParser, Rule};
 
-pub fn parse_pairs(pairs: Pairs<Rule>, level: Option<u8>) -> Result<Vec<AstNode>, pest::error::Error<Rule>> {
+pub fn parse_pairs(
+    pairs: Pairs<Rule>,
+    level: Option<u8>,
+) -> Result<Vec<AstNode>, pest::error::Error<Rule>> {
     let mut ast_nodes: Vec<AstNode> = vec![];
     for pair in pairs {
         print_pair(&pair, level);
@@ -20,10 +23,15 @@ pub fn parse_pairs(pairs: Pairs<Rule>, level: Option<u8>) -> Result<Vec<AstNode>
                 use pest::pratt_parser::{Assoc::*, Op};
 
                 let pratt_parser = PrattParser::<Rule>::new()
+                    .op(Op::infix(Rule::equals, Left)
+                        | Op::infix(Rule::not_equals, Left)
+                        | Op::infix(Rule::greater_than, Left)
+                        | Op::infix(Rule::greater_than_or_equal_to, Left)
+                        | Op::infix(Rule::less_than, Left)
+                        | Op::infix(Rule::less_than_or_equal_to, Left))
                     .op(Op::infix(Rule::add, Left) | Op::infix(Rule::subtract, Left))
                     .op(Op::infix(Rule::multiply, Left) | Op::infix(Rule::divide, Left))
-                    .op(Op::infix(Rule::modulo, Left))
-                    .op(Op::infix(Rule::equals, Left));
+                    .op(Op::infix(Rule::modulo, Left));
 
                 let pairs = pratt_parser
                     .map_primary(|primary| {
@@ -44,6 +52,11 @@ pub fn parse_pairs(pairs: Pairs<Rule>, level: Option<u8>) -> Result<Vec<AstNode>
                                 Rule::divide => Some(BinaryOp::Div),
                                 Rule::modulo => Some(BinaryOp::Mod),
                                 Rule::equals => Some(BinaryOp::Eq),
+                                Rule::not_equals => Some(BinaryOp::Neq),
+                                Rule::greater_than => Some(BinaryOp::Gt),
+                                Rule::greater_than_or_equal_to => Some(BinaryOp::Gte),
+                                Rule::less_than => Some(BinaryOp::Lt),
+                                Rule::less_than_or_equal_to => Some(BinaryOp::Lte),
                                 _ => None,
                             },
                             Some(Box::new(right.unwrap())),

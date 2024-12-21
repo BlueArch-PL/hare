@@ -6,6 +6,11 @@ pub enum BinaryOp {
     Div,
     Mod,
     Eq,
+    Neq,
+    Gt,
+    Gte,
+    Lt,
+    Lte,
 }
 
 #[derive(Debug)]
