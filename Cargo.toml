@@ -1,5 +1,5 @@
 [package]
-name = "blue-archc"
+name = "hare"
 version = "0.1.0"
 edition = "2021"
 
@@ -7,3 +7,12 @@ edition = "2021"
 pest = "2.6"
 pest_derive = "2.6"
 lazy_static = "1.4"
+log = "0.4"
+pretty_env_logger = "0.4"
+
+[dev-dependencies]
+criterion = "0.3"
+
+[[bench]]
+name = "parse"
+harness = false
