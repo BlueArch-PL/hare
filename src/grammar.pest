@@ -2,12 +2,12 @@
 program = _{ SOI ~ ("{"? ~ statement ~ "}"?)* ~ EOI }
 
 // Statements
-statement = { expr ~ ";" }
+statement = { expr ~ ";"? }
 // assignment = { ident ~ "=" ~ expr }
 
 // Expressions
 expr = { term ~ (bin_op ~ term)* }
-term = _{ constant | ident }
+term = _{ ( "(" ~ expr ~ ")" ) | constant | ident }
 bin_op = _{ 
     add
     | subtract
@@ -35,7 +35,7 @@ greater_than_or_equal_to = @{ ">=" }
 less_than_or_equal_to = @{ "<=" }
 
 // Identifiers
-ident = @{ (LETTER | "_" | NUMBER)+}
+ident = @{ (LETTER | "_" | NUMBER)+ }
 
 // Constants
 constant = { int | float | string | boolean }

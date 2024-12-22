@@ -17,7 +17,53 @@ pub enum BinaryOp {
 pub enum AstNode {
     Constant(String),
     Expr(Box<AstNode>, Option<BinaryOp>, Option<Box<AstNode>>),
+    Identifier(String),
     Empty,
+    PrefixNotation(Vec<String>),
+}
+
+impl BinaryOp {
+    pub fn as_raw(&self) -> &str {
+        match self {
+            BinaryOp::Add => "+",
+            BinaryOp::Sub => "-",
+            BinaryOp::Mul => "*",
+            BinaryOp::Div => "/",
+            BinaryOp::Mod => "%",
+            BinaryOp::Eq => "==",
+            BinaryOp::Neq => "!=",
+            BinaryOp::Gt => ">",
+            BinaryOp::Gte => ">=",
+            BinaryOp::Lt => "<",
+            BinaryOp::Lte => "<=",
+        }
+    }
+}
+
+impl AstNode {
+    pub fn as_code(&self) -> String {
+        match self {
+            AstNode::Constant(s) => s.to_string(),
+            AstNode::Identifier(s) => s.to_string(),
+            AstNode::Expr(left, op, right) => {
+                let left_string = left.as_code().to_string();
+
+                if op.is_some() && right.is_some() {
+                    let right_string = right.as_ref().unwrap().as_code().to_string();
+
+                    format!(
+                        "({} {} {})",
+                        left_string,
+                        op.as_ref().unwrap().as_raw(),
+                        right_string
+                    )
+                } else {
+                    left_string
+                }
+            }
+            _ => "".to_string(),
+        }
+    }
 }
 
 impl PartialEq for BinaryOp {
