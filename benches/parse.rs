@@ -6,9 +6,11 @@ fn parse_expr(expr: &str) {
 }
 
 fn criterion_benchmark(c: &mut Criterion) {
-    c.bench_function("parse_expr", |b| {
+    c.bench_function("parse_expr1", |b| {
         b.iter(|| parse_expr(black_box("1 + 2 * 3 / 4;")));
-        b.iter(|| parse_expr(black_box("1 + 2 * 3 / (4 - 5) * 6;")));
+    });
+
+    c.bench_function("parse_expr2", |b| {
         b.iter(|| parse_expr(black_box("1 + 2 * 3 / (4 - 5) * 6 + 7;")));
     });
 }
