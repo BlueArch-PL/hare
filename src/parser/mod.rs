@@ -27,6 +27,17 @@ lazy_static::lazy_static! {
     };
 }
 
+/// 解析常量节点
+///
+/// 该函数接受一个`Pair<Rule>`类型的参数，根据其规则解析为相应的常量节点。
+///
+/// # 参数
+///
+/// - `pair`: 一个`Pair<Rule>`类型的参数，表示要解析的常量节点。
+///
+/// # 返回值
+///
+/// 返回一个`Option<AstNode>`类型的值，表示解析后的常量节点。如果解析失败，则返回`None`。
 pub fn parse_constant(pair: Pair<Rule>) -> Option<AstNode> {
     match pair.as_rule() {
         Rule::int => Some(AstNode::Constant(
@@ -44,6 +55,17 @@ pub fn parse_constant(pair: Pair<Rule>) -> Option<AstNode> {
     }
 }
 
+/// 解析标识符节点
+///
+/// 该函数接受一个`Pair<Rule>`类型的参数，根据其规则解析为相应的标识符节点。
+///
+/// # 参数
+///
+/// - `pair`: 一个`Pair<Rule>`类型的参数，表示要解析的标识符节点。
+///
+/// # 返回值
+///
+/// 返回一个`Option<AstNode>`类型的值，表示解析后的标识符节点。如果解析失败，则返回`None`。
 pub fn parse_ident(pair: Pair<Rule>) -> Option<AstNode> {
     match pair.as_rule() {
         Rule::ident => Some(AstNode::Identifier(pair.as_str().to_string())),
@@ -51,6 +73,17 @@ pub fn parse_ident(pair: Pair<Rule>) -> Option<AstNode> {
     }
 }
 
+/// 解析表达式节点
+///
+/// 该函数接受一个`Pair<Rule>`类型的参数，根据其规则解析为相应的表达式节点。
+///
+/// # 参数
+///
+/// - `pair`: 一个`Pair<Rule>`类型的参数，表示要解析的表达式节点。
+///
+/// # 返回值
+///
+/// 返回一个`Option<AstNode>`类型的值，表示解析后的表达式节点。如果解析失败，则返回`None`。
 pub fn parse_expr(pair: Pair<Rule>) -> Option<AstNode> {
     PRATT_PARSER
         .map_primary(|primary: Pair<'_, Rule>| {
@@ -92,6 +125,63 @@ pub fn parse_expr(pair: Pair<Rule>) -> Option<AstNode> {
         .parse(pair.into_inner())
 }
 
+/// 解析语句节点
+///
+/// 该函数接受一个`Pair<Rule>`类型的参数，根据其规则解析为相应的语句节点。
+///
+/// # 参数
+///
+/// - `pair`: 一个`Pair<Rule>`类型的参数，表示要解析的语句节点。
+///
+/// # 返回值
+///
+/// 返回一个`Option<AstNode>`类型的值，表示解析后的语句节点。如果解析失败，则返回`None`。
+pub fn parse_statement(pair: Pair<Rule>) -> Option<AstNode> {
+    match pair.as_rule() {
+        Rule::assign_statement => {
+            let mut pairs = pair.clone().into_inner();
+            let identifier = pairs.next().unwrap();
+
+            // have type annotation
+            if pair.clone().into_inner().count() == 3 {
+                let type_annotation = pairs.next().unwrap();
+                let value = pairs.next().unwrap();
+
+                Some(AstNode::Assign(
+                    Box::new(parse_ident(identifier).unwrap()),
+                    Some(Box::new(parse_ident(type_annotation).unwrap())),
+                    Box::new(parse_expr(value).unwrap()),
+                ))
+            } else if pair.clone().into_inner().count() == 2 {
+                let value = pairs.next().unwrap();
+
+                Some(AstNode::Assign(
+                    Box::new(parse_ident(identifier).unwrap()),
+                    None,
+                    Box::new(parse_expr(value).unwrap()),
+                ))
+            } else {
+                panic!("Invalid assign statement")
+            }
+        }
+        Rule::statement => parse_statement(pair.into_inner().next().unwrap()),
+        Rule::expr => parse_expr(pair),
+        _ => None,
+    }
+}
+
+/// 解析节点对
+///
+/// 该函数接受一个`Pairs<Rule>`类型的参数，根据其规则解析为相应的 Ast Node。
+///
+/// # 参数
+///
+/// - `pairs`: 一个`Pairs<Rule>`类型的参数，表示要解析的节点对。
+/// - `level`: 一个`Option<u8>`类型的参数，表示解析的层级。
+///
+/// # 返回值
+///
+/// 返回一个`Result<Vec<AstNode>, pest::error::Error<Rule>>`类型的值，表示解析后的节点对。如果解析失败，则返回`Err`。
 pub fn parse_pairs(
     pairs: Pairs<Rule>,
     level: Option<u8>,
@@ -101,7 +191,8 @@ pub fn parse_pairs(
         print_pair(&pair, level);
 
         match pair.as_rule() {
-            Rule::expr => ast_nodes.push(parse_expr(pair).unwrap()),
+            // Statement nodes
+            Rule::statement => ast_nodes.push(parse_statement(pair).unwrap()),
             // Constant nodes
             Rule::constant => ast_nodes.push(parse_constant(pair).unwrap()),
             // Identifier nodes
@@ -121,6 +212,17 @@ pub fn parse_pairs(
     Ok(ast_nodes)
 }
 
+/// 解析输入字符串
+///
+/// 该函数接受一个`&str`类型的参数，根据其规则解析为相应的节点对。
+///
+/// # 参数
+///
+/// - `input`: 一个`&str`类型的参数，表示要解析的输入字符串。
+///
+/// # 返回值
+///
+/// 返回一个`Result<Vec<AstNode>, pest::error::Error<Rule>>`类型的值，表示解析后的节点对。如果解析失败，则返回`Err`。
 pub fn parse(input: &str) -> Result<Vec<AstNode>, pest::error::Error<Rule>> {
     let pairs = BlueArchParser::parse(Rule::program, input)?;
     parse_pairs(pairs, Some(0))

@@ -2,7 +2,14 @@
 program = _{ SOI ~ ("{"? ~ statement ~ "}"?)* ~ EOI }
 
 // Statements
-statement = { expr ~ ";"? }
+statement = {
+    (
+        assign_statement
+        | expr
+    )
+    ~ ";"?
+}
+assign_statement = { "let " ~ ident ~ ( ":" ~ ident)? ~ "=" ~ expr }
 // assignment = { ident ~ "=" ~ expr }
 
 // Expressions
