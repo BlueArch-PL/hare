@@ -29,6 +29,12 @@ fn criterion_benchmark(c: &mut Criterion) {
         b.iter(|| parse_expr(black_box("let z: bool = true")));
         b.iter(|| parse_expr(black_box("let a: str = \"a\";")));
     });
+
+    c.bench_function("parse_assign_without_type_annotation", |b| {
+        b.iter(|| parse_expr(black_box("let x = 1 + 2 * 3 / 4;")));
+        b.iter(|| parse_expr(black_box("let z = true")));
+        b.iter(|| parse_expr(black_box("let a = \"a\";")));       
+    });
 }
 
 criterion_group!(benches, criterion_benchmark);
