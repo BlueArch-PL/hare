@@ -38,7 +38,7 @@ lazy_static::lazy_static! {
 /// # 返回值
 ///
 /// 返回一个`Option<AstNode>`类型的值，表示解析后的常量节点。如果解析失败，则返回`None`。
-pub fn parse_constant(pair: Pair<Rule>) -> Option<AstNode> {
+pub fn parse_constant(pair: &Pair<Rule>) -> Option<AstNode> {
     match pair.as_rule() {
         Rule::int => Some(AstNode::Constant(
             pair.as_str().parse::<i128>().unwrap().to_string(),
@@ -50,7 +50,7 @@ pub fn parse_constant(pair: Pair<Rule>) -> Option<AstNode> {
         Rule::boolean => Some(AstNode::Constant(
             pair.as_str().parse::<bool>().unwrap().to_string(),
         )),
-        Rule::constant => Some(parse_constant(pair.into_inner().next().unwrap()).unwrap()),
+        Rule::constant => Some(parse_constant(&pair.clone().into_inner().next().unwrap()).unwrap()),
         _ => None,
     }
 }
@@ -66,7 +66,7 @@ pub fn parse_constant(pair: Pair<Rule>) -> Option<AstNode> {
 /// # 返回值
 ///
 /// 返回一个`Option<AstNode>`类型的值，表示解析后的标识符节点。如果解析失败，则返回`None`。
-pub fn parse_ident(pair: Pair<Rule>) -> Option<AstNode> {
+pub fn parse_ident(pair: &Pair<Rule>) -> Option<AstNode> {
     match pair.as_rule() {
         Rule::ident => Some(AstNode::Identifier(pair.as_str().to_string())),
         _ => None,
@@ -84,17 +84,17 @@ pub fn parse_ident(pair: Pair<Rule>) -> Option<AstNode> {
 /// # 返回值
 ///
 /// 返回一个`Option<AstNode>`类型的值，表示解析后的表达式节点。如果解析失败，则返回`None`。
-pub fn parse_expr(pair: Pair<Rule>) -> Option<AstNode> {
+pub fn parse_expr(pair: &Pair<Rule>) -> Option<AstNode> {
     PRATT_PARSER
         .map_primary(|primary: Pair<'_, Rule>| {
-            let mut pair = parse_constant(primary.clone());
+            let mut pair = parse_constant(&primary);
 
             if pair.is_none() {
-                pair = parse_ident(primary.clone());
+                pair = parse_ident(&primary);
             }
 
             if pair.is_none() {
-                pair = parse_expr(primary.clone());
+                pair = parse_expr(&primary);
             }
 
             pair
@@ -122,7 +122,7 @@ pub fn parse_expr(pair: Pair<Rule>) -> Option<AstNode> {
                 Some(Box::new(right.unwrap())),
             ))
         })
-        .parse(pair.into_inner())
+        .parse(pair.clone().into_inner())
 }
 
 /// 解析语句节点
@@ -136,7 +136,7 @@ pub fn parse_expr(pair: Pair<Rule>) -> Option<AstNode> {
 /// # 返回值
 ///
 /// 返回一个`Option<AstNode>`类型的值，表示解析后的语句节点。如果解析失败，则返回`None`。
-pub fn parse_statement(pair: Pair<Rule>) -> Option<AstNode> {
+pub fn parse_statement(pair: &Pair<Rule>) -> Option<AstNode> {
     match pair.as_rule() {
         Rule::assign_statement => {
             let mut pairs = pair.clone().into_inner();
@@ -148,17 +148,17 @@ pub fn parse_statement(pair: Pair<Rule>) -> Option<AstNode> {
                 let value = pairs.next().unwrap();
 
                 Some(AstNode::Assign(
-                    Box::new(parse_ident(identifier).unwrap()),
-                    Some(Box::new(parse_ident(type_annotation).unwrap())),
-                    Box::new(parse_expr(value).unwrap()),
+                    Box::new(parse_ident(&identifier).unwrap()),
+                    Some(Box::new(parse_ident(&type_annotation).unwrap())),
+                    Box::new(parse_expr(&value).unwrap()),
                 ))
             } else if pair.clone().into_inner().count() == 2 {
                 let value = pairs.next().unwrap();
 
                 Some(AstNode::Assign(
-                    Box::new(parse_ident(identifier).unwrap()),
+                    Box::new(parse_ident(&identifier).unwrap()),
                     None,
-                    Box::new(parse_expr(value).unwrap()),
+                    Box::new(parse_expr(&value).unwrap()),
                 ))
             } else {
                 panic!("Invalid assign statement")
@@ -169,15 +169,15 @@ pub fn parse_statement(pair: Pair<Rule>) -> Option<AstNode> {
             let identifier = pairs.next().unwrap();
             let value = pairs.next().unwrap();
 
-            let identifier = parse_ident(identifier);
-            let value = parse_expr(value);
+            let identifier = parse_ident(&identifier);
+            let value = parse_expr(&value);
 
             Some(AstNode::SetValue(
                 Box::new(identifier.expect("Invalid identifier")),
                 Box::new(value.expect("Invalid value")),
             ))
         }
-        Rule::statement => parse_statement(pair.into_inner().next().unwrap()),
+        Rule::statement => parse_statement(&pair.clone().into_inner().next().unwrap()),
         Rule::expr => parse_expr(pair),
         _ => None,
     }
@@ -205,11 +205,11 @@ pub fn parse_pairs(
 
         match pair.as_rule() {
             // Statement nodes
-            Rule::statement => ast_nodes.push(parse_statement(pair).unwrap()),
+            Rule::statement => ast_nodes.push(parse_statement(&pair).unwrap()),
             // Constant nodes
-            Rule::constant => ast_nodes.push(parse_constant(pair).unwrap()),
+            Rule::constant => ast_nodes.push(parse_constant(&pair).unwrap()),
             // Identifier nodes
-            Rule::ident => ast_nodes.push(parse_ident(pair).unwrap()),
+            Rule::ident => ast_nodes.push(parse_ident(&pair).unwrap()),
             // Other nodes
             Rule::EOI => {}
             _ => {
