@@ -94,12 +94,16 @@ impl AstNode {
             }
             AstNode::Assign(identifier, type_annotation, value) => {
                 let identifier_string = identifier.as_code().to_string();
-                
+
                 if type_annotation.is_some() {
-                    let type_annotation_string = type_annotation.as_ref().unwrap().as_code().to_string();
+                    let type_annotation_string =
+                        type_annotation.as_ref().unwrap().as_code().to_string();
                     let value_string = value.as_code().to_string();
 
-                    format!("let {}: {} = {};", identifier_string, type_annotation_string, value_string)
+                    format!(
+                        "let {}: {} = {};",
+                        identifier_string, type_annotation_string, value_string
+                    )
                 } else {
                     let value_string = value.as_code().to_string();
 

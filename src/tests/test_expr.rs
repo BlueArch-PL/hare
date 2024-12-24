@@ -1,14 +1,16 @@
-use crate::parser::*;
-use ast::AstNode::*;
-use ast::BinaryOp::*;
-use pest::Parser;
+#[allow(dead_code)]
+fn create_constant(value: &str) -> crate::parser::AstNode {
+    use crate::parser::*;
 
-fn create_constant(value: &str) -> AstNode {
     AstNode::Constant(value.to_string())
 }
 
 #[test]
 fn test_expr1() {
+    use crate::parser::*;
+
+    use pest::Parser;
+
     let expr = "1 + 2;";
     let pairs = BlueArchParser::parse(Rule::program, expr);
 
@@ -31,6 +33,10 @@ fn test_expr1() {
 
 #[test]
 fn test_expr2() {
+    use crate::parser::*;
+
+    use pest::Parser;
+
     let expr = "1 - 2 * 3;";
     let pairs = BlueArchParser::parse(Rule::program, expr);
 
@@ -57,6 +63,10 @@ fn test_expr2() {
 
 #[test]
 fn test_expr3() {
+    use crate::parser::*;
+
+    use pest::Parser;
+
     let expr = "1 + 2 * 3 - 4 / 5;";
     let pairs = BlueArchParser::parse(Rule::program, expr);
 
@@ -91,6 +101,10 @@ fn test_expr3() {
 
 #[test]
 fn test_expr4() {
+    use crate::parser::*;
+
+    use pest::Parser;
+
     let expr = "1 + 2 * 3 - 4 / 5 * 6;";
     let pairs = BlueArchParser::parse(Rule::program, expr);
 
@@ -129,6 +143,10 @@ fn test_expr4() {
 
 #[test]
 fn test_expr5() {
+    use crate::parser::*;
+
+    use pest::Parser;
+
     let expr = "1 + 2 * 3 - 4 / 5 * 6 + 7;";
     let pairs = BlueArchParser::parse(Rule::program, expr);
 
@@ -171,6 +189,10 @@ fn test_expr5() {
 
 #[test]
 fn test_expr6() {
+    use crate::parser::*;
+
+    use pest::Parser;
+
     let expr = "1 + 2 * 3 - 4 / 5 * 6 + 7 - 8 / 9 * 10;";
     let pairs = BlueArchParser::parse(Rule::program, expr);
 
