@@ -5,11 +5,13 @@ program = _{ SOI ~ ("{"? ~ statement ~ "}"?)* ~ EOI }
 statement = {
     (
         assign_statement
+        | set_value_statement
         | expr
     )
     ~ ";"?
 }
 assign_statement = { "let " ~ ident ~ ( ":" ~ ident)? ~ "=" ~ expr }
+set_value_statement = { ident ~ "=" ~ expr }
 // assignment = { ident ~ "=" ~ expr }
 
 // Expressions

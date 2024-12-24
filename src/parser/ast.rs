@@ -40,6 +40,8 @@ pub enum AstNode {
     Identifier(String),
     /// 表示赋值语句的节点，包含标识符、类型注解和值
     Assign(Box<AstNode>, Option<Box<AstNode>>, Box<AstNode>),
+    /// 表示设置变量值的节点，包含函数名、参数列表和函数体
+    SetValue(Box<AstNode>, Box<AstNode>),
     /// 表示空节点
     Empty,
 }
@@ -102,6 +104,12 @@ impl AstNode {
 
                     format!("let {} = {};", identifier_string, value_string)
                 }
+            }
+            AstNode::SetValue(identifier, value) => {
+                let identifier_string = identifier.as_code().to_string();
+                let value_string = value.as_code().to_string();
+
+                format!("{} = {};", identifier_string, value_string)
             }
             _ => "".to_string(),
         }

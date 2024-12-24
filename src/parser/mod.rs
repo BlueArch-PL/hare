@@ -164,6 +164,19 @@ pub fn parse_statement(pair: Pair<Rule>) -> Option<AstNode> {
                 panic!("Invalid assign statement")
             }
         }
+        Rule::set_value_statement => {
+            let mut pairs = pair.clone().into_inner();
+            let identifier = pairs.next().unwrap();
+            let value = pairs.next().unwrap();
+
+            let identifier = parse_ident(identifier);
+            let value = parse_expr(value);
+
+            Some(AstNode::SetValue(
+                Box::new(identifier.expect("Invalid identifier")),
+                Box::new(value.expect("Invalid value")),
+            ))
+        }
         Rule::statement => parse_statement(pair.into_inner().next().unwrap()),
         Rule::expr => parse_expr(pair),
         _ => None,
