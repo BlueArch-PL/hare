@@ -25,26 +25,31 @@ pub fn print_pairs(pairs: &Pairs<Rule>, level: Option<u8>) {
     }
 }
 
+#[allow(dead_code)]
 #[inline]
 pub fn debug(message: String) {
     debug!(target:"parser", "{}", message);
 }
 
+#[allow(dead_code)]
 #[inline]
 pub fn error(message: String) {
     error!(target:"parser", "{}", message);
 }
 
+#[allow(dead_code)]
 #[inline]
 pub fn info(message: String) {
     info!(target:"parser", "{}", message);
 }
 
+#[allow(dead_code)]
 #[inline]
 pub fn trace(message: String) {
     trace!(target:"parser", "{}", message);
 }
 
+#[allow(dead_code)]
 #[inline]
 pub fn warn(message: String) {
     warn!(target:"parser", "{}", message);

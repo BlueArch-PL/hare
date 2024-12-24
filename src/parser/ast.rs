@@ -30,6 +30,7 @@ pub enum BinaryOp {
 /// 表示抽象语法树节点的枚举类型
 ///
 /// 这个枚举类型定义了所有可能的抽象语法树节点，如常量、表达式、标识符、赋值语句等。
+#[allow(dead_code)]
 #[derive(Debug)]
 pub enum AstNode {
     /// 表示常量的节点
