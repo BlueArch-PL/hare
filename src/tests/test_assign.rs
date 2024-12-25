@@ -10,11 +10,11 @@ fn test_assign1() {
 
     assert!(pairs.is_ok());
 
-    let ast = parse_pairs(pairs.unwrap(), Some(0));
+    let ast = parse_pairs(pairs.unwrap());
     assert!(ast.is_ok());
     let ast = ast.unwrap();
 
-    assert!(ast.len() == 1);
+    assert_eq!(ast.len(), 1);
     assert_eq!(ast[0].as_code(), "let a = 1;");
 }
 
@@ -28,10 +28,10 @@ fn test_assign2() {
     let expr = "let a = 1 + 2";
     let pairs = BlueArchParser::parse(Rule::program, expr);
     assert!(pairs.is_ok());
-    let ast = parse_pairs(pairs.unwrap(), Some(0));
+    let ast = parse_pairs(pairs.unwrap());
     assert!(ast.is_ok());
     let ast = ast.unwrap();
-    assert!(ast.len() == 1);
+    assert_eq!(ast.len(), 1);
     assert_eq!(ast[0].as_code(), "let a = (1 + 2);");
 }
 
@@ -45,10 +45,10 @@ fn test_assign3() {
     let expr = "let a: int = 1 + 2 + 3";
     let pairs = BlueArchParser::parse(Rule::program, expr);
     assert!(pairs.is_ok());
-    let ast = parse_pairs(pairs.unwrap(), Some(0));
+    let ast = parse_pairs(pairs.unwrap());
     assert!(ast.is_ok());
     let ast = ast.unwrap();
-    assert!(ast.len() == 1);
+    assert_eq!(ast.len(), 1);
     assert_eq!(ast[0].as_code(), "let a: int = ((1 + 2) + 3);");
 }
 

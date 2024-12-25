@@ -1,0 +1,9 @@
+if true {
+    let b = 1;
+} elif a == 2 {
+    let b = 2;
+} elif a == 3 {
+    let b = 3
+} else {
+    let b = 4;
+}

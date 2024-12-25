@@ -49,8 +49,21 @@ pub enum AstNode {
     SetValue(Box<AstNode>, Box<AstNode>),
     /// 表示一个块执行后的返回值，包含返回值
     ReturnBlock(Box<AstNode>),
-    /// 表示空节点
+    /// 表示空节点，仅用于解析器内部使用，不会出现在对外的接口中
     Empty,
+
+    // 流程控制节点
+    /// If 节点，包含条件和分支，Fallback 分支
+    If(
+        Box<AstNode>,
+        Box<AstNode>,
+        Vec<AstNode>,
+        Option<Box<AstNode>>,
+    ),
+    /// Elif 节点，包含条件和分支
+    Elif(Box<AstNode>, Box<AstNode>),
+    /// Else 节点，包含分支
+    Else(Box<AstNode>),
 }
 
 impl BinaryOp {
@@ -132,6 +145,29 @@ impl AstNode {
 
                 format!("{{{}}}", code)
             }
+            AstNode::ReturnBlock(value) => {
+                let value_string = value.as_code().to_string();
+                format!("return {};", value_string)
+            }
+            AstNode::If(cond, block, elif_nodes, else_nodes) => {
+                let mut code = format!("if {} \n{}\n", cond.as_code(), block.as_code());
+                for node in elif_nodes {
+                    code.push_str(&node.as_code());
+                    code.push('\n');
+                }
+                if let Some(else_node) = else_nodes {
+                    code.push_str(&else_node.as_code());
+                    code.push('\n');
+                }
+                code
+            }
+            AstNode::Elif(cond, block) => {
+                format!("elif {} \n{}\n", cond.as_code(), block.as_code())
+            }
+            AstNode::Else(block) => {
+                format!("else \n{}\n", block.as_code())
+            }
+
             _ => "".to_string(),
         }
     }
@@ -175,6 +211,22 @@ impl AstNode {
                 let left = left.format_ast();
                 let right = right.as_ref().map(|node| Box::new(node.format_ast()));
                 AstNode::Expr(Box::new(left), op.clone(), right)
+            }
+            AstNode::If(cond, block, elif_nodes, else_nodes) => {
+                let cond = cond.format_ast();
+                let block = block.format_ast();
+                let elif_nodes = elif_nodes
+                    .iter()
+                    .map(|node| node.format_ast())
+                    .collect::<Vec<AstNode>>();
+                let else_node = else_nodes.as_ref().map(|node| Box::new(node.format_ast()));
+
+                let cond = match cond {
+                    AstNode::Expr(_, _, _) => cond,
+                    _ => AstNode::Expr(Box::new(cond), None, None),
+                };
+
+                AstNode::If(Box::new(cond), Box::new(block), elif_nodes, else_node)
             }
             _ => self.clone(),
         }
@@ -260,6 +312,14 @@ impl Clone for AstNode {
             SetValue(func, params) => SetValue(func.clone(), params.clone()),
             ReturnBlock(expr) => ReturnBlock(expr.clone()),
             Empty => Empty,
+            If(cond, block, elifs, fallback) => If(
+                cond.clone(),
+                block.clone(),
+                elifs.iter().map(|node| node.clone()).collect(),
+                fallback.as_ref().map(|node| node.clone()),
+            ),
+            Elif(cond, block) => Elif(cond.clone(), block.clone()),
+            Else(block) => Else(block.clone()),
         }
     }
 }

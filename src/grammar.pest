@@ -10,6 +10,7 @@ statement = {
         assign_statement
         | set_value_statement
         | return_block_statement
+        | if_statement
         | expr
     )
     ~ ";"?
@@ -17,6 +18,13 @@ statement = {
 assign_statement = { "let " ~ ident ~ ( ":" ~ ident)? ~ "=" ~ expr }
 set_value_statement = { ident ~ "=" ~ expr }
 return_block_statement = { "rtb " ~ expr }
+if_statement = {
+    "if " ~ expr ~ block
+    ~ elif_statement*
+    ~ else_statement?
+}
+elif_statement = { "elif " ~ expr ~ block }
+else_statement = { "else " ~ block }
 
 // Expressions
 expr = { term ~ (bin_op ~ term)* }

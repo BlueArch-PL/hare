@@ -16,7 +16,7 @@ fn test_expr1() {
 
     assert!(pairs.is_ok());
 
-    let ast = parse_pairs(pairs.unwrap(), Some(0));
+    let ast = parse_pairs(pairs.unwrap());
     assert!(ast.is_ok());
     let ast = ast.unwrap();
 
@@ -42,7 +42,7 @@ fn test_expr2() {
 
     assert!(pairs.is_ok());
 
-    let ast = parse_pairs(pairs.unwrap(), Some(0));
+    let ast = parse_pairs(pairs.unwrap());
     assert!(ast.is_ok());
     let ast = ast.unwrap();
 
@@ -72,7 +72,7 @@ fn test_expr3() {
 
     assert!(pairs.is_ok());
 
-    let ast = parse_pairs(pairs.unwrap(), Some(0));
+    let ast = parse_pairs(pairs.unwrap());
     assert!(ast.is_ok());
     let ast = ast.unwrap();
 
@@ -110,7 +110,7 @@ fn test_expr4() {
 
     assert!(pairs.is_ok());
 
-    let ast = parse_pairs(pairs.unwrap(), Some(0));
+    let ast = parse_pairs(pairs.unwrap());
     assert!(ast.is_ok());
     let ast = ast.unwrap();
 
@@ -152,7 +152,7 @@ fn test_expr5() {
 
     assert!(pairs.is_ok());
 
-    let ast = parse_pairs(pairs.unwrap(), Some(0));
+    let ast = parse_pairs(pairs.unwrap());
     assert!(ast.is_ok());
     let ast = ast.unwrap();
 
@@ -198,7 +198,7 @@ fn test_expr6() {
 
     assert!(pairs.is_ok());
 
-    let ast = parse_pairs(pairs.unwrap(), Some(0));
+    let ast = parse_pairs(pairs.unwrap());
     assert!(ast.is_ok());
     let ast = ast.unwrap();
 

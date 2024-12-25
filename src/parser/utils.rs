@@ -7,14 +7,14 @@ pub fn print_pair(pair: &Pair<Rule>, level: Option<u8>) {
 
     debug(format!(
         "{} [{:?}] {:?}",
-        " ".repeat(level.unwrap() as usize),
+        " ".repeat(level.unwrap_or(0) as usize),
         pair.as_rule(),
         pair.as_str()
     ));
 
     let inner = pair.into_inner();
     if inner.len() > 0 {
-        print_pairs(&inner, Some(level.unwrap() + 1));
+        print_pairs(&inner, Some(level.unwrap_or(0) + 1));
     }
 }
 

@@ -10,7 +10,7 @@ fn test_set_value1() {
 
     assert!(pairs.is_ok());
 
-    let ast = parse_pairs(pairs.unwrap(), Some(0));
+    let ast = parse_pairs(pairs.unwrap());
     assert!(ast.is_ok());
     let ast = ast.unwrap();
 
@@ -28,7 +28,7 @@ fn test_set_value2() {
     let expr = "a = 1 + 2";
     let pairs = BlueArchParser::parse(Rule::program, expr);
     assert!(pairs.is_ok());
-    let ast = parse_pairs(pairs.unwrap(), Some(0));
+    let ast = parse_pairs(pairs.unwrap());
     assert!(ast.is_ok());
     let ast = ast.unwrap();
     assert!(ast.len() == 1);
@@ -45,7 +45,7 @@ fn test_set_value3() {
     let expr = "a = 1 + 2 * 3";
     let pairs = BlueArchParser::parse(Rule::program, expr);
     assert!(pairs.is_ok());
-    let ast = parse_pairs(pairs.unwrap(), Some(0));
+    let ast = parse_pairs(pairs.unwrap());
     assert!(ast.is_ok());
     let ast = ast.unwrap();
     assert!(ast.len() == 1);
