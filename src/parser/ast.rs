@@ -1,3 +1,5 @@
+use std::fmt::format;
+
 /// 表示二元操作符的枚举类型
 ///
 /// 这个枚举类型定义了所有支持的二元操作符，如加法、减法、乘法、除法等。
@@ -33,6 +35,8 @@ pub enum BinaryOp {
 #[allow(dead_code)]
 #[derive(Debug)]
 pub enum AstNode {
+    /// 表示多个抽象语法树节点的块
+    Block(Vec<AstNode>),
     /// 表示常量的节点
     Constant(String),
     /// 表示表达式的节点，包含左操作数、操作符和右操作数
@@ -43,6 +47,8 @@ pub enum AstNode {
     Assign(Box<AstNode>, Option<Box<AstNode>>, Box<AstNode>),
     /// 表示设置变量值的节点，包含函数名、参数列表和函数体
     SetValue(Box<AstNode>, Box<AstNode>),
+    /// 表示一个块执行后的返回值，包含返回值
+    ReturnBlock(Box<AstNode>),
     /// 表示空节点
     Empty,
 }
@@ -115,6 +121,16 @@ impl AstNode {
                 let value_string = value.as_code().to_string();
 
                 format!("{} = {};", identifier_string, value_string)
+            }
+            AstNode::Block(nodes) => {
+                let mut code = String::new();
+
+                for node in nodes {
+                    code.push_str(&node.as_code());
+                    code.push('\n');
+                };
+
+                format!("{{{}}}", code)
             }
             _ => "".to_string(),
         }

@@ -1,18 +1,22 @@
 // Program
-program = _{ SOI ~ ("{"? ~ statement ~ "}"?)* ~ EOI }
+program = _{ SOI ~ ( block | statement )* ~ EOI }
+
+// Block
+block = { "{" ~ statement* ~ "}" }
 
 // Statements
 statement = {
     (
         assign_statement
         | set_value_statement
+        | return_block_statement
         | expr
     )
     ~ ";"?
 }
 assign_statement = { "let " ~ ident ~ ( ":" ~ ident)? ~ "=" ~ expr }
 set_value_statement = { ident ~ "=" ~ expr }
-// assignment = { ident ~ "=" ~ expr }
+return_block_statement = { "rtb " ~ expr }
 
 // Expressions
 expr = { term ~ (bin_op ~ term)* }
@@ -53,5 +57,5 @@ float = @{"0." | (NUMBER)+ ~ "." ~ (NUMBER)+}
 string = @{"\"" ~ LETTER* ~ "\""}
 boolean = @{"true" | "false"}
 
-WHITESPACE = _{ " " }
+WHITESPACE = _{ " " | "\n" | "\t"  }
 COMMENT = _{ "#" ~ (!"\n" ~ ANY)* }

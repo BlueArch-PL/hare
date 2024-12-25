@@ -177,6 +177,13 @@ pub fn parse_statement(pair: &Pair<Rule>) -> Option<AstNode> {
                 Box::new(value.expect("Invalid value")),
             ))
         }
+        Rule::return_block_statement => {
+            let mut pairs = pair.clone().into_inner();
+
+            Some(AstNode::ReturnBlock(Box::new(
+                parse_expr(&pairs.next().unwrap()).unwrap(),
+            )))
+        }
         Rule::statement => parse_statement(&pair.clone().into_inner().next().unwrap()),
         Rule::expr => parse_expr(pair),
         _ => None,
@@ -204,6 +211,10 @@ pub fn parse_pairs(
         print_pair(&pair, level);
 
         match pair.as_rule() {
+            Rule::block => ast_nodes.push(AstNode::Block(parse_pairs(
+                pair.into_inner(),
+                Some(level.unwrap_or(0) + 1),
+            )?)),
             // Statement nodes
             Rule::statement => ast_nodes.push(parse_statement(&pair).unwrap()),
             // Constant nodes
