@@ -53,6 +53,7 @@ pub fn parse_constant(pair: &Pair<Rule>) -> Option<AstNode> {
         Rule::constant => Some(parse_constant(&pair.clone().into_inner().next().unwrap()).unwrap()),
         _ => None,
     }
+    .map(|x| x.format_ast())
 }
 
 /// 解析标识符节点
@@ -71,6 +72,7 @@ pub fn parse_ident(pair: &Pair<Rule>) -> Option<AstNode> {
         Rule::ident => Some(AstNode::Identifier(pair.as_str().to_string())),
         _ => None,
     }
+    .map(|x| x.format_ast())
 }
 
 /// 解析表达式节点
@@ -123,6 +125,7 @@ pub fn parse_expr(pair: &Pair<Rule>) -> Option<AstNode> {
             ))
         })
         .parse(pair.clone().into_inner())
+        .map(|x| x.format_ast())
 }
 
 /// 解析语句节点
@@ -188,6 +191,7 @@ pub fn parse_statement(pair: &Pair<Rule>) -> Option<AstNode> {
         Rule::expr => parse_expr(pair),
         _ => None,
     }
+    .map(|x| x.format_ast())
 }
 
 /// 解析节点对
@@ -233,7 +237,7 @@ pub fn parse_pairs(
         };
     }
 
-    Ok(ast_nodes)
+    Ok(ast_nodes.iter().map(|x| x.format_ast()).collect())
 }
 
 /// 解析输入字符串

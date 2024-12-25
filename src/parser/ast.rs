@@ -128,11 +128,55 @@ impl AstNode {
                 for node in nodes {
                     code.push_str(&node.as_code());
                     code.push('\n');
-                };
+                }
 
                 format!("{{{}}}", code)
             }
             _ => "".to_string(),
+        }
+    }
+
+    /// 将抽象语法树节点格式化，确保符合规范
+    pub fn format_ast(&self) -> AstNode {
+        match self {
+            AstNode::Assign(identifier, type_annotation, value) => {
+                let identifier = identifier.format_ast();
+                let type_annotation = type_annotation
+                    .as_ref()
+                    .map(|node| Box::new(node.format_ast()));
+                let value = value.format_ast();
+
+                let value = match value {
+                    AstNode::Expr(_, _, _) => value,
+                    _ => AstNode::Expr(Box::new(value), None, None),
+                };
+
+                AstNode::Assign(Box::new(identifier), type_annotation, Box::new(value))
+            }
+            AstNode::Block(nodes) => {
+                let mut formatted_nodes: Vec<AstNode> = vec![];
+                for node in nodes {
+                    let formatted_node = node.format_ast();
+                    formatted_nodes.push(formatted_node);
+                }
+
+                AstNode::Block(formatted_nodes)
+            }
+            AstNode::ReturnBlock(value) => {
+                let value = value.format_ast();
+                AstNode::ReturnBlock(Box::new(value))
+            }
+            AstNode::SetValue(identifier, value) => {
+                let identifier = identifier.format_ast();
+                let value = value.format_ast();
+                AstNode::SetValue(Box::new(identifier), Box::new(value))
+            }
+            AstNode::Expr(left, op, right) => {
+                let left = left.format_ast();
+                let right = right.as_ref().map(|node| Box::new(node.format_ast()));
+                AstNode::Expr(Box::new(left), op.clone(), right)
+            }
+            _ => self.clone(),
         }
     }
 }
@@ -168,6 +212,54 @@ impl PartialEq for AstNode {
                     && b == d
             }
             _ => false,
+        }
+    }
+}
+
+impl Clone for BinaryOp {
+    /// 克隆二元操作符
+    ///
+    /// 这个方法克隆二元操作符，返回一个新的二元操作符。
+    fn clone(&self) -> Self {
+        match self {
+            BinaryOp::Add => BinaryOp::Add,
+            BinaryOp::Sub => BinaryOp::Sub,
+            BinaryOp::Mul => BinaryOp::Mul,
+            BinaryOp::Div => BinaryOp::Div,
+            BinaryOp::Mod => BinaryOp::Mod,
+            BinaryOp::Eq => BinaryOp::Eq,
+            BinaryOp::Neq => BinaryOp::Neq,
+            BinaryOp::Gt => BinaryOp::Gt,
+            BinaryOp::Gte => BinaryOp::Gte,
+            BinaryOp::Lt => BinaryOp::Lt,
+            BinaryOp::Lte => BinaryOp::Lte,
+        }
+    }
+}
+
+impl Clone for AstNode {
+    /// 克隆抽象语法树节点
+    ///
+    /// 这个方法克隆抽象语法树节点，返回一个新的抽象语法树节点。
+    fn clone(&self) -> Self {
+        use AstNode::*;
+        match self {
+            Block(nodes) => Block(nodes.iter().map(|node| node.clone()).collect()),
+            Constant(s) => Constant(s.clone()),
+            Expr(left, op, right) => Expr(
+                left.clone(),
+                op.clone(),
+                right.as_ref().map(|node| node.clone()),
+            ),
+            Identifier(s) => Identifier(s.clone()),
+            Assign(id, value, expr) => Assign(
+                id.clone(),
+                value.as_ref().map(|node| node.clone()),
+                expr.clone(),
+            ),
+            SetValue(func, params) => SetValue(func.clone(), params.clone()),
+            ReturnBlock(expr) => ReturnBlock(expr.clone()),
+            Empty => Empty,
         }
     }
 }
