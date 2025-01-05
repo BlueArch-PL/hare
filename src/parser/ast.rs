@@ -35,6 +35,7 @@ pub enum BinaryOp {
 #[allow(dead_code)]
 #[derive(Debug)]
 pub enum AstNode {
+    Program(Vec<AstNode>),
     /// 表示多个抽象语法树节点的块
     Block(Vec<AstNode>),
     /// 表示常量的节点
@@ -93,6 +94,14 @@ impl AstNode {
     /// 这个方法返回抽象语法树节点的代码表示，如常量、表达式、标识符、赋值语句等。
     pub fn as_code(&self) -> String {
         match self {
+            AstNode::Program(nodes) => {
+                let mut code = String::new();
+                for node in nodes {
+                    code.push_str(&node.as_code());
+                    code.push('\n');
+                }
+                code
+            }
             AstNode::Constant(s) => s.to_string(),
             AstNode::Identifier(s) => s.to_string(),
             AstNode::Expr(left, op, right) => {
@@ -296,6 +305,7 @@ impl Clone for AstNode {
     fn clone(&self) -> Self {
         use AstNode::*;
         match self {
+            Program(nodes) => Program(nodes.iter().map(|node| node.clone()).collect()),
             Block(nodes) => Block(nodes.iter().map(|node| node.clone()).collect()),
             Constant(s) => Constant(s.clone()),
             Expr(left, op, right) => Expr(

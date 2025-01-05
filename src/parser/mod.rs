@@ -238,9 +238,9 @@ pub fn parse_pairs(pairs: Pairs<Rule>) -> Result<Vec<AstNode>, ParserError> {
 /// # 返回值
 ///
 /// 返回一个`Result<Vec<AstNode>, pest::error::Error<Rule>>`类型的值，表示解析后的节点对。如果解析失败，则返回`Err`。
-pub fn parse(input: &str) -> Result<Vec<AstNode>, ParserError> {
+pub fn parse(input: &str) -> Result<AstNode, ParserError> {
     let pairs = BlueArchParser::parse(Rule::program, input)?;
     print_pairs(&pairs, None);
 
-    parse_pairs(pairs)
+    Ok(AstNode::Program(parse_pairs(pairs)?))
 }

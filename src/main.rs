@@ -1,17 +1,11 @@
+mod compiler;
 mod parser;
 mod tests;
 
 use clap::Command;
+use compiler::print_bytecodes;
 use parser::*;
 use std::{fmt::format, io::BufRead};
-
-fn print_debug(ast: Vec<AstNode>) {
-    parser::utils::debug(format!("AST: {:#?}", ast));
-    for node in ast {
-        parser::utils::debug(format!("As Code: {:#?}", node.as_code()));
-    }
-}
-
 fn main() {
     pretty_env_logger::init();
     let matches = Command::new("hare")
@@ -22,14 +16,18 @@ fn main() {
         .arg(clap::arg!(-c --code <CODE> "Code to be compiled").required_unless_present("input"))
         .get_matches();
 
+    let _ast: AstNode;
+
     if let Some(code) = matches.get_one::<String>("code") {
-        let ast = parse(code).expect("Failed to parse input to AST!");
-        print_debug(ast);
+        _ast = parse(code).expect("Failed to parse input to AST!");
+    } else if let Some(file) = matches.get_one::<String>("input") {
+        let code = std::fs::read_to_string(file).expect("Failed to read input file!");
+        _ast = parse(code.as_str()).expect("Failed to parse input to AST!");
+    } else {
+        println!("No input file or code provided!");
+        return;
     }
 
-    if let Some(file) = matches.get_one::<String>("input") {
-        let code = std::fs::read_to_string(file).expect("Failed to read input file!");
-        let ast = parse(code.as_str()).expect("Failed to parse input to AST!");
-        print_debug(ast);
-    }
+    let codes = _ast.compile().expect("Failed to compile AST!");
+    print_bytecodes(&codes);
 }
