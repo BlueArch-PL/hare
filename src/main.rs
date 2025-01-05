@@ -5,7 +5,6 @@ mod tests;
 use clap::Command;
 use compiler::print_bytecodes;
 use parser::*;
-use std::{fmt::format, io::BufRead};
 fn main() {
     pretty_env_logger::init();
     let matches = Command::new("hare")

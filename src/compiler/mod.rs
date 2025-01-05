@@ -1,5 +1,4 @@
 use crate::BinaryOp;
-use log::debug;
 use rand::Rng;
 
 use crate::ast::AstNode;

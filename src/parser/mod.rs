@@ -64,7 +64,7 @@ pub fn parse_binary_op(pair: &Pair<Rule>) -> Result<BinaryOp, ParserError> {
 pub fn parse_expr(pair: &Pair<Rule>) -> Option<AstNode> {
     PRATT_PARSER
         .map_primary(|primary: Pair<'_, Rule>| {
-            let mut pair = parse_pair(&primary).ok();
+            let pair = parse_pair(&primary).ok();
 
             pair
         })
